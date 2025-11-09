@@ -24,6 +24,13 @@ class Product(models.Model):
         verbose_name="Описание товара",
         help_text="Укажите описание товара",
     )
+    price = models.DecimalField(
+        default=0.00,
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена",
+        help_text="Укажите цену"
+    )
     product_launch_date = models.DateField(
         verbose_name="Дата выхода товара на рынок",
         help_text="Укажите дату выхода товара на рынок",

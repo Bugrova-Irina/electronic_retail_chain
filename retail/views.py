@@ -6,7 +6,7 @@ from retail.pagination import CustomPagination
 from retail.serializers import SellerSerializer
 
 
-class RetailCreateAPIView(CreateAPIView):
+class SellerCreateAPIView(CreateAPIView):
     """Создание продавца"""
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
