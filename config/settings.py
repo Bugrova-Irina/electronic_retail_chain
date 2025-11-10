@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "users",
     "retail",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -84,6 +85,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django.filters.rest_framework.DjangoFilterBackend",
+    ]
 }
 
 # Database

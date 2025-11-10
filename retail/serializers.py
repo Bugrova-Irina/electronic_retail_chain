@@ -48,6 +48,12 @@ class SellerProductSerializer(serializers.ModelSerializer):
 
         return data
 
+    # Явно запрещаем обновление поля debt при PUT/PATCH запросах
+    def update(self, instance, validated_data):
+        # Удаляем debt из validate_data, если он там есть
+        validated_data.pop("debt", None)
+        return super().update(instance, validated_data)
+
 
 class SellerSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Продавца"""

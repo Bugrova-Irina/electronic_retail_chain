@@ -1,3 +1,5 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -19,6 +21,11 @@ class SellerListAPIView(ListAPIView):
     serializer_class = SellerSerializer
     permission_classes = (IsAuthenticated,)
     pagination_class = CustomPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ["country"]  # Фильтрация по точному совпадению страны
+    search_fields = ["seller_title", "city"]  # Поиск по названию и городу
+    ordering_fields = ["seller_title", "creation_time"]  # Сортировка
+    ordering = ["seller_title"]  # Сортировка по умолчанию
 
 
 class SellerRetrieveAPIView(RetrieveAPIView):
