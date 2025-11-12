@@ -5,24 +5,23 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 
+from retail.mixins import ActiveEmployeePermissionMixin
 from retail.models import Product, Seller, SellerProduct
 from retail.pagination import CustomPagination
 from retail.serializers import (ProductSerializer, SellerProductSerializer,
                                 SellerSerializer)
 
 
-class SellerCreateAPIView(CreateAPIView):
+class SellerCreateAPIView(ActiveEmployeePermissionMixin, CreateAPIView):
     """Создание продавца"""
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class SellerListAPIView(ListAPIView):
+class SellerListAPIView(ActiveEmployeePermissionMixin, ListAPIView):
     """Вывод списка продавцов"""
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
-    permission_classes = (IsAuthenticated,)
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["country"]  # Фильтрация по точному совпадению страны
@@ -31,94 +30,81 @@ class SellerListAPIView(ListAPIView):
     ordering = ["seller_title"]  # Сортировка по умолчанию
 
 
-class SellerRetrieveAPIView(RetrieveAPIView):
+class SellerRetrieveAPIView(ActiveEmployeePermissionMixin, RetrieveAPIView):
     """Вывод информации о продавце"""
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class SellerUpdateAPIView(UpdateAPIView):
+class SellerUpdateAPIView(ActiveEmployeePermissionMixin, UpdateAPIView):
     """Обновление продавца"""
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class SellerDestroyAPIView(DestroyAPIView):
+class SellerDestroyAPIView(ActiveEmployeePermissionMixin, DestroyAPIView):
     """Удаление продавца"""
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class ProductCreateAPIView(CreateAPIView):
+class ProductCreateAPIView(ActiveEmployeePermissionMixin, CreateAPIView):
     """Создание продавца"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class ProductListAPIView(ListAPIView):
+class ProductListAPIView(ActiveEmployeePermissionMixin, ListAPIView):
     """Вывод списка продавцов"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = (IsAuthenticated,)
     pagination_class = CustomPagination
 
 
-class ProductRetrieveAPIView(RetrieveAPIView):
+class ProductRetrieveAPIView(ActiveEmployeePermissionMixin, RetrieveAPIView):
     """Вывод информации о продавце"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class ProductUpdateAPIView(UpdateAPIView):
+class ProductUpdateAPIView(ActiveEmployeePermissionMixin, UpdateAPIView):
     """Обновление продавца"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class ProductDestroyAPIView(DestroyAPIView):
+class ProductDestroyAPIView(ActiveEmployeePermissionMixin, DestroyAPIView):
     """Удаление продавца"""
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class SellerProductCreateAPIView(CreateAPIView):
+class SellerProductCreateAPIView(ActiveEmployeePermissionMixin, CreateAPIView):
     """Создание cвязи продавец-товар"""
     queryset = SellerProduct.objects.all()
     serializer_class = SellerProductSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class SellerProductListAPIView(ListAPIView):
+class SellerProductListAPIView(ActiveEmployeePermissionMixin, ListAPIView):
     """Вывод списка связей продавец-товар"""
     queryset = SellerProduct.objects.all()
     serializer_class = SellerProductSerializer
-    permission_classes = (IsAuthenticated,)
     pagination_class = CustomPagination
 
 
-class SellerProductRetrieveAPIView(RetrieveAPIView):
+class SellerProductRetrieveAPIView(ActiveEmployeePermissionMixin, RetrieveAPIView):
     """Вывод информации о связи продавец-товар"""
     queryset = SellerProduct.objects.all()
     serializer_class = SellerProductSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class SellerProductUpdateAPIView(UpdateAPIView):
+class SellerProductUpdateAPIView(ActiveEmployeePermissionMixin, UpdateAPIView):
     """Обновление связи продавец-товар"""
     queryset = SellerProduct.objects.all()
     serializer_class = SellerProductSerializer
-    permission_classes = (IsAuthenticated,)
 
 
-class SellerProductDestroyAPIView(DestroyAPIView):
+class SellerProductDestroyAPIView(ActiveEmployeePermissionMixin, DestroyAPIView):
     """Удаление связи продавец-товар"""
     queryset = SellerProduct.objects.all()
     serializer_class = SellerProductSerializer
-    permission_classes = (IsAuthenticated,)
