@@ -21,30 +21,35 @@ class SellerProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = SellerProduct
         fields = "__all__"
-        read_only_fields = ["hierarchy_level", "debt", "created_at"]
+        read_only_fields = ["hierarchy_level"]
 
     def validate(self, data):
+        # Для PATCH-запросов используем существующие значения из instance
+        seller = data.get("seller", getattr(self.instance, "seller", None) if self.instance else data.get("seller"))
+        supplier = data.get("supplier", getattr(self.instance, "supplier", None) if self.instance else data.get("supplier"))
+
         # Проверка, что поставщик не равен продавцу
-        if data.get("seller") == data.get("supplier"):
+        if seller and supplier and seller == supplier:
             raise serializers.ValidationError({
                 "supplier": "Продавец не может быть своим собственным поставщиком"
             })
-        # Проверка, что связь уникальна
-        seller = data.get("seller")
-        product = data.get("product")
-        supplier = data.get("supplier")
+        # Проверка, что связь уникальна (только для создания)
+        if not self.instance:  # Только при создании нового объекта
+            seller = data.get("seller")
+            product = data.get("product")
+            supplier = data.get("supplier")
 
-        if seller and product and supplier:
-            existing = SellerProduct.objects.filter(
-                seller=seller,
-                product=product,
-                supplier=supplier,
-            ).exists()
+            if seller and product and supplier:
+                existing = SellerProduct.objects.filter(
+                    seller=seller,
+                    product=product,
+                    supplier=supplier,
+                ).exists()
 
-            if existing and not self.instance:  # При создании нового объекта
-                raise serializers.ValidationError({
-                    "detail": "Такая связь уже существует"
-                })
+                if existing:
+                    raise serializers.ValidationError({
+                        "detail": "Такая связь уже существует"
+                    })
 
         return data
 
