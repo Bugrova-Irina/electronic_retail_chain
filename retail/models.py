@@ -79,7 +79,7 @@ class Seller(models.Model):
         min_level = SellerProduct.objects.filter(seller=self).aggregate(
             min_level=models.Min("hierarchy_level")
         )["min_level"]
-        return  min_level if min_level is not None else 0
+        return min_level if min_level is not None else 0
 
     @property
     def max_hierarchy_level(self):

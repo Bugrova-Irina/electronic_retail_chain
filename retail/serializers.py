@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from retail.models import Seller, Product, SellerProduct
+from retail.models import Product, Seller, SellerProduct
 
 
 class SellerProductSerializer(serializers.ModelSerializer):
@@ -26,7 +26,9 @@ class SellerProductSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # Для PATCH-запросов используем существующие значения из instance
         seller = data.get("seller", getattr(self.instance, "seller", None) if self.instance else data.get("seller"))
-        supplier = data.get("supplier", getattr(self.instance, "supplier", None) if self.instance else data.get("supplier"))
+        supplier = data.get(
+            "supplier", getattr(self.instance, "supplier", None) if self.instance else data.get("supplier")
+        )
 
         # Проверка, что поставщик не равен продавцу
         if seller and supplier and seller == supplier:

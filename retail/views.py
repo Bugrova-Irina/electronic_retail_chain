@@ -1,11 +1,14 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.generics import (CreateAPIView, DestroyAPIView,
+                                     ListAPIView, RetrieveAPIView,
+                                     UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 
-from retail.models import Seller, Product, SellerProduct
+from retail.models import Product, Seller, SellerProduct
 from retail.pagination import CustomPagination
-from retail.serializers import SellerSerializer, ProductSerializer, SellerProductSerializer
+from retail.serializers import (ProductSerializer, SellerProductSerializer,
+                                SellerSerializer)
 
 
 class SellerCreateAPIView(CreateAPIView):

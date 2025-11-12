@@ -1,10 +1,16 @@
 from django.urls import path
 
 from retail.apps import RetailConfig
-from retail.views import SellerListAPIView, SellerRetrieveAPIView, SellerUpdateAPIView, SellerDestroyAPIView, \
-    SellerCreateAPIView, ProductListAPIView, ProductRetrieveAPIView, ProductUpdateAPIView, ProductCreateAPIView, \
-    ProductDestroyAPIView, SellerProductListAPIView, SellerProductRetrieveAPIView, SellerProductUpdateAPIView, \
-    SellerProductCreateAPIView, SellerProductDestroyAPIView
+from retail.views import (ProductCreateAPIView, ProductDestroyAPIView,
+                          ProductListAPIView, ProductRetrieveAPIView,
+                          ProductUpdateAPIView, SellerCreateAPIView,
+                          SellerDestroyAPIView, SellerListAPIView,
+                          SellerProductCreateAPIView,
+                          SellerProductDestroyAPIView,
+                          SellerProductListAPIView,
+                          SellerProductRetrieveAPIView,
+                          SellerProductUpdateAPIView, SellerRetrieveAPIView,
+                          SellerUpdateAPIView)
 
 app_name = RetailConfig.name
 

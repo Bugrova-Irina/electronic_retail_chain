@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from retail.models import Seller, Product, SellerProduct
+from retail.models import Product, Seller, SellerProduct
 
 
 @admin.register(Seller)
