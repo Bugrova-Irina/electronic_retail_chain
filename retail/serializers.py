@@ -5,17 +5,13 @@ from retail.models import Product, Seller, SellerProduct
 
 class SellerProductSerializer(serializers.ModelSerializer):
     """Сериализатор для модели связи Продавца и Товара"""
-    seller_title = serializers.CharField(
-        source="seller.seller_title",
-        read_only=True
-    )
+
+    seller_title = serializers.CharField(source="seller.seller_title", read_only=True)
     product_title = serializers.CharField(
-        source="product.product_title",
-        read_only=True
+        source="product.product_title", read_only=True
     )
     supplier_title = serializers.CharField(
-        source="supplier.seller_title",
-        read_only=True
+        source="supplier.seller_title", read_only=True
     )
 
     class Meta:
@@ -25,16 +21,28 @@ class SellerProductSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # Для PATCH-запросов используем существующие значения из instance
-        seller = data.get("seller", getattr(self.instance, "seller", None) if self.instance else data.get("seller"))
+        seller = data.get(
+            "seller",
+            (
+                getattr(self.instance, "seller", None)
+                if self.instance
+                else data.get("seller")
+            ),
+        )
         supplier = data.get(
-            "supplier", getattr(self.instance, "supplier", None) if self.instance else data.get("supplier")
+            "supplier",
+            (
+                getattr(self.instance, "supplier", None)
+                if self.instance
+                else data.get("supplier")
+            ),
         )
 
         # Проверка, что поставщик не равен продавцу
         if seller and supplier and seller == supplier:
-            raise serializers.ValidationError({
-                "supplier": "Продавец не может быть своим собственным поставщиком"
-            })
+            raise serializers.ValidationError(
+                {"supplier": "Продавец не может быть своим собственным поставщиком"}
+            )
         # Проверка, что связь уникальна (только для создания)
         if not self.instance:  # Только при создании нового объекта
             seller = data.get("seller")
@@ -49,9 +57,9 @@ class SellerProductSerializer(serializers.ModelSerializer):
                 ).exists()
 
                 if existing:
-                    raise serializers.ValidationError({
-                        "detail": "Такая связь уже существует"
-                    })
+                    raise serializers.ValidationError(
+                        {"detail": "Такая связь уже существует"}
+                    )
 
         return data
 
@@ -66,13 +74,9 @@ class SellerSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Продавца"""
 
     total_debt = serializers.DecimalField(
-        max_digits=11,
-        decimal_places=2,
-        read_only=True
+        max_digits=11, decimal_places=2, read_only=True
     )
-    effective_hierarchy_level = serializers.IntegerField(
-        read_only=True
-    )
+    effective_hierarchy_level = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Seller
@@ -83,8 +87,7 @@ class ProductSerializer(serializers.ModelSerializer):
     """Сериализатор для товара"""
 
     manufacturer_name = serializers.CharField(
-        source="manufacturer.seller_title",
-        read_only=True
+        source="manufacturer.seller_title", read_only=True
     )
 
     class Meta:

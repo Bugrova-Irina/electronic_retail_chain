@@ -69,9 +69,12 @@ class Seller(models.Model):
     @property
     def total_debt(self):
         """Общая задолженность перед всеми поставщиками"""
-        return self.sellerproduct_set.aggregate(
-            total_debt=models.Sum("debt")
-        )["total_debt"] or 0
+        return (
+            self.sellerproduct_set.aggregate(total_debt=models.Sum("debt"))[
+                "total_debt"
+            ]
+            or 0
+        )
 
     @property
     def min_hierarchy_level(self):
@@ -132,7 +135,7 @@ class Product(models.Model):
         on_delete=models.PROTECT,
         limit_choices_to={"seller_type__in": [Seller.FACTORY, Seller.ENTREPRENEUR]},
         verbose_name="Производитель",
-        help_text="Укажите производителя (завод или ИП)"
+        help_text="Укажите производителя (завод или ИП)",
     )
     product_launch_date = models.DateField(
         verbose_name="Дата выхода товара на рынок",
@@ -185,7 +188,7 @@ class SellerProduct(models.Model):
         decimal_places=2,
         default=0.00,
         verbose_name="Задолженность за этот товар",
-        help_text="Укажите задолженность за этот товар",
+        help_text="Укажите задолженность за этот товар с копейками в формате 0.00",
     )
     hierarchy_level = models.IntegerField(
         default=0,
@@ -206,8 +209,7 @@ class SellerProduct(models.Model):
             else:
                 # Находим уровень поставщика для этого же товара и добавляем 1
                 supplier_product = SellerProduct.objects.filter(
-                    seller=self.supplier,
-                    product=self.product
+                    seller=self.supplier, product=self.product
                 ).first()
 
                 if supplier_product:

@@ -40,6 +40,11 @@ class User(AbstractUser):
         verbose_name="Аватар",
         help_text="Добавьте аватар",
     )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Активен или отключен",
+        help_text="Укажите, активен или отключен пользователь",
+    )
 
     # Авторизация по email
     USERNAME_FIELD = "email"
