@@ -104,6 +104,7 @@ class Seller(models.Model):
     class Meta:
         verbose_name = "Продавец"
         verbose_name_plural = "Продавцы"
+        ordering = ["seller_title", "id"]
 
     def __str__(self):
         return f"{self.seller_title} - {self.seller_type}"
@@ -145,6 +146,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
+        ordering = ["product_title", "id"]
 
     def __str__(self):
         return f"{self.product_title} {self.product_model}"
@@ -200,6 +202,7 @@ class SellerProduct(models.Model):
         verbose_name = "Связь продавца с товаром"
         verbose_name_plural = "Связи продавцов с товарами"
         unique_together = ["seller", "product", "supplier"]
+        ordering = ["seller", "product"]
 
     def save(self, *args, **kwargs):
         # Вычисляем уровень иерархии при сохранении
