@@ -87,7 +87,7 @@ class Seller(models.Model):
     @property
     def max_hierarchy_level(self):
         """Максимальный уровень иерархии среди всех товаров продавца"""
-        max_level = SellerProduct.objects.filter(seller=self).agregate(
+        max_level = SellerProduct.objects.filter(seller=self).aggregate(
             max_level=models.Max("hierarchy_level")
         )["max_level"]
         return max_level if max_level is not None else 0
@@ -184,6 +184,8 @@ class SellerProduct(models.Model):
         related_name="supplied_items",
         verbose_name="Поставщик этого товара",
         help_text="Укажите поставщика этого товара",
+        null=True,
+        blank=True,
     )
     debt = models.DecimalField(
         max_digits=11,
@@ -206,7 +208,9 @@ class SellerProduct(models.Model):
 
     def save(self, *args, **kwargs):
         # Вычисляем уровень иерархии при сохранении
-        if self.supplier:
+        if self.supplier is None:
+            self.hierarchy_level = 0
+        else:
             if self.supplier.seller_type == Seller.FACTORY:
                 self.hierarchy_level = 1
             else:
@@ -220,9 +224,6 @@ class SellerProduct(models.Model):
                 else:
                     # Если у поставщика нет этого товара, считаем уровень 1
                     self.hierarchy_level = 1
-        else:
-            self.hierarchy_level = 0
-
         super().save(*args, **kwargs)
 
     def __str__(self):

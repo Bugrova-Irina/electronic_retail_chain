@@ -9,12 +9,14 @@ from retail.models import Product, Seller, SellerProduct
 @admin.register(Seller)
 class SellerAdmin(admin.ModelAdmin):
     list_display = [
+        "id",
         "seller_title",
         "seller_type",
         "email",
         "country",
         "city",
         "supplier_link",
+        "total_debt",
         "creation_time",
     ]
     list_filter = ["seller_type", "city", "country", "creation_time"]
@@ -36,13 +38,15 @@ class SellerAdmin(admin.ModelAdmin):
             for seller_product in supplier_products[
                 :5
             ]:  # Показываем первых 5 поставщиков
-                url = reverse(
-                    "admin:retail_seller_change", args=[seller_product.supplier.id]
-                )
-                suppliers.append(
-                    f'<a href="{url}">{seller_product.supplier.seller_title}</a>'
-                )
-            return format_html(", ".join(suppliers))
+                if seller_product.supplier:
+                    url = reverse(
+                        "admin:retail_seller_change", args=[seller_product.supplier.id]
+                    )
+                    suppliers.append(
+                        f'<a href="{url}">{seller_product.supplier.seller_title}</a>'
+                    )
+            if suppliers:
+                return format_html(", ".join(suppliers))
         return "Нет поставщиков"
 
     supplier_link.short_description = "Поставщики"
@@ -59,6 +63,7 @@ class SellerAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
+        "id",
         "product_title",
         "product_model",
         "manufacturer",
@@ -136,8 +141,11 @@ class SellerProductAdmin(admin.ModelAdmin):
     product_link.admin_order_field = "product__product_title"
 
     def supplier_link(self, obj):
-        url = reverse("admin:retail_seller_change", args=[obj.supplier.id])
-        return format_html('<a href="{}">{}</a>', url, obj.supplier.seller_title)
+        if obj.supplier:
+            url = reverse("admin:retail_seller_change", args=[obj.supplier.id])
+            return format_html('<a href="{}">{}</a>', url, obj.supplier.seller_title)
+        else:
+            return "Нет поставщика"
 
     supplier_link.short_description = "Поставщик"
     supplier_link.admin_order_field = "supplier__seller_title"

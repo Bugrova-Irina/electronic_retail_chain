@@ -21,22 +21,15 @@ class SellerProductSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # Для PATCH-запросов используем существующие значения из instance
-        seller = data.get(
-            "seller",
-            (
-                getattr(self.instance, "seller", None)
-                if self.instance
-                else data.get("seller")
-            ),
-        )
-        supplier = data.get(
-            "supplier",
-            (
-                getattr(self.instance, "supplier", None)
-                if self.instance
-                else data.get("supplier")
-            ),
-        )
+        seller = data.get("seller")
+        supplier = data.get("supplier")
+
+        # Если это обновление и поля не переданы, берем текущие значения
+        if self.instance:
+            if seller is None:
+                seller = self.instance.seller
+            if supplier is None:
+                supplier = self.instance.supplier
 
         # Проверка, что поставщик не равен продавцу
         if seller and supplier and seller == supplier:
@@ -45,9 +38,7 @@ class SellerProductSerializer(serializers.ModelSerializer):
             )
         # Проверка, что связь уникальна (только для создания)
         if not self.instance:  # Только при создании нового объекта
-            seller = data.get("seller")
             product = data.get("product")
-            supplier = data.get("supplier")
 
             if seller and product and supplier:
                 existing = SellerProduct.objects.filter(
