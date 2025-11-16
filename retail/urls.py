@@ -10,7 +10,7 @@ from retail.views import (ProductCreateAPIView, ProductDestroyAPIView,
                           SellerProductListAPIView,
                           SellerProductRetrieveAPIView,
                           SellerProductUpdateAPIView, SellerRetrieveAPIView,
-                          SellerUpdateAPIView)
+                          SellerUpdateAPIView, SupplierListAPIView)
 
 app_name = RetailConfig.name
 
@@ -57,5 +57,8 @@ urlpatterns = [
         "seller-product/<int:pk>/delete/",
         SellerProductDestroyAPIView.as_view(),
         name="seller-product-delete",
+    ),
+    path(
+        "suppliers/", SupplierListAPIView.as_view(), name="suppliers"
     ),
 ]

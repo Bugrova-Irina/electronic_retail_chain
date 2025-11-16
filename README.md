@@ -1,7 +1,9 @@
 # Торговая сеть электроники на DjangoRestFramework
 ```python manage.py runserver``` - запуск веб-приложения. Ctrl+C - остановка сервера.
 
-```python manage.py createsuperadmin``` - создание суперпользователя
+```python manage.py createsuperadmin```- создание суперпользователя, логин и пароль задаете сами.
+
+```python manage.py createadmin```- создание суперпользователя с логином и паролем по умолчанию.
 
 ```python manage.py test``` - запуск тестов
 
@@ -41,7 +43,7 @@
 
 - Seller (Продавец) - основная информация о продавце.
 - Product (Товар) - основная информация о товаре.
-- SellerProduct(Связь между продавцом и товаром) - связывает продавца, товар и поставщика,
+- SellerProduct (Связь между продавцом и товаром) - связывает продавца, товар и поставщика,
 хранит цену, количество, задолженность, автоматически вычисляет уровень иерархии.
 - User (Пользователь приложения).
 
@@ -67,8 +69,15 @@ SellerProductAdmin:
 * Редактирование долга в списке (list_editable = ["debt"]).
 
 ### API Эндпоинты
+- Регистрация нового пользователя
+```
+POST /users/register/
+{
+    "email": "user@example.com",
+    "password": "password"
+}
+```
 - Аутентификация
-
 ```
 POST /users/login/
 {
@@ -76,12 +85,15 @@ POST /users/login/
     "password": "password"
 }
 ```
-- CRUD для Seller, Product, SellerProduct
+- CRUD для Seller, Product, SellerProduct. Для поставщиков используется CRUD для Seller
+  (создание, просмотр детальной информации поставщика, обновление, удаление, т.к. поставщик - 
+это продавец с поставками товаров) и только для списка поставщиков создан отдельный эндпоинт.
 - По ссылке http://127.0.0.1:8000/retail/ доступен список продавцов (заводов, розничных
 магазинов, ИП).
 - По ссылке http://127.0.0.1:8000/retail/products/ доступен список товаров.
 - По ссылке http://127.0.0.1:8000/retail/seller-product/ доступен список связей между 
 товарами и продавцами.
+- По ссылке http://127.0.0.1:8000/retail/suppliers/ доступен список поставщиков.
 
 ## Требования к окружению:
 
@@ -161,7 +173,7 @@ poetry add django-filter
 ### Фильтрация и поиск в API
 Фильтрация продавцов по стране:
 ```
-GET http://127.0.0.1:8000/retail/?country=Russia
+GET http://127.0.0.1:8000/retail/?country=Россия
 ```
 Поиск:
 ```
@@ -178,6 +190,22 @@ GET http://127.0.0.1:8000/retail/?ordering=city,-seller_title    # комбин�
 ```
 GET http://127.0.0.1:8000/retail/?page=2
 GET http://127.0.0.1:8000/retail/?page_size=10
+```
+Фильтрация поставщиков по стране:
+```
+GET http://127.0.0.1:8000/retail/suppliers/?country=Россия
+```
+Фильтрация по типу поставщика:
+```
+GET http://127.0.0.1:8000/retail/suppliers/?supplier_type=factory
+```
+Поиск поставщиков:
+```
+GET http://127.0.0.1:8000/retail/suppliers/?search=Electro
+```
+Сортировка:
+```
+GET http://127.0.0.1:8000/retail/suppliers/?ordering=-supplied_products_count
 ```
 
 ### Создание цепочки поставок

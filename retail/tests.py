@@ -80,6 +80,125 @@ class SellerTestCase(APITestCase):
         self.assertEqual(seller_data["seller_type"], self.seller.seller_type)
         self.assertEqual(seller_data["email"], self.seller.email)
 
+    def test_supplier_list_multiple_suppliers(self):
+        """Тестирование списка поставщиков с несколькими поставщиками"""
+
+        # Создаем несколько поставщиков
+        factory_supplier = Seller.objects.create(
+            seller_title="Factory Supplier",
+            seller_type="factory",
+            email="factory_supplier@test.com",
+        )
+        retail_supplier = Seller.objects.create(
+            seller_title="Retail Supplier",
+            seller_type="retail",
+            email="retail_supplier@test.com",
+        )
+        non_supplier = Seller.objects.create(
+            seller_title="Not a Supplier",
+            seller_type="retail",
+            email="non_supplier@test.com",
+        )
+
+        # Создаем товары
+        product1 = Product.objects.create(
+            product_title="Product 1",
+            manufacturer=factory_supplier,
+            product_launch_date="2024-01-01",
+        )
+        product2 = Product.objects.create(
+            product_title="Product 2",
+            manufacturer=factory_supplier,
+            product_launch_date="2024-01-02",
+        )
+
+        # Создаем связи, где factory_supplier и retail_supplier - поставщики
+        SellerProduct.objects.create(
+            seller=self.seller,
+            product=product1,
+            supplier=factory_supplier,
+            selling_price=1000.00,
+            quantity=5
+        )
+        SellerProduct.objects.create(
+            seller=non_supplier,
+            product=product2,
+            supplier=retail_supplier,
+            selling_price=2000.00,
+            quantity=3
+        )
+
+        url = reverse("retail:suppliers")
+        response = self.client.get(url)
+        data = response.json()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data["count"], 2) # Два поставщика
+
+        # Проверяем, что не-поставщик не в списке
+        supplier_titles = [s["seller_title"] for s in data["results"]]
+        self.assertIn("Factory Supplier", supplier_titles)
+        self.assertIn("Retail Supplier", supplier_titles)
+        self.assertNotIn("Not a Supplier", supplier_titles)
+
+    def test_supplier_list_filtering(self):
+        """Тестирование фильтрации поставщиков"""
+
+        # Создаем поставщиков разных типов и стран
+        factory_ru = Seller.objects.create(
+            seller_title="Russian factory",
+            seller_type="factory",
+            email="factory_ru@test.com",
+            country="Russia"
+        )
+        retail_ru = Seller.objects.create(
+            seller_title="Russian retail",
+            seller_type="retail",
+            email="retail_ru@test.com",
+            country="Russia"
+        )
+        factory_de = Seller.objects.create(
+            seller_title="German factory",
+            seller_type="factory",
+            email="factory_de@test.com",
+            country="Germany"
+        )
+
+        product = Product.objects.create(
+            product_title="Test Product",
+            manufacturer=factory_ru,
+            product_launch_date="2024-01-03"
+        )
+
+        # Создаем связи для всех поставщиков
+        for supplier in [factory_ru, retail_ru, factory_de]:
+            SellerProduct.objects.create(
+                seller=self.seller,
+                product=product,
+                supplier=supplier,
+                selling_price=1000.00,
+                quantity=1
+            )
+
+        # Тест фильтрации по стране
+        url = reverse("retail:suppliers")
+        response = self.client.get(url, {"country": "Russia"})
+        data = response.json()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(data["count"], 2)  # Только российские поставщики
+
+        # Тест фильтрации по типу
+        response = self.client.get(url, {"supplier_type": "factory"})
+        data = response.json()
+        self.assertEqual(data["count"], 2)  # Только заводы
+
+        # Тест поиска
+        response = self.client.get(url, {"search": "German"})
+        data = response.json()
+        self.assertEqual(data["count"], 1)
+        self.assertEqual(data["results"][0]["seller_title"], "German factory")
+
 
 class ProductTestCase(APITestCase):
     """Тестирование CRUD товара"""

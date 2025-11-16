@@ -68,10 +68,16 @@ class SellerSerializer(serializers.ModelSerializer):
         max_digits=11, decimal_places=2, read_only=True
     )
     effective_hierarchy_level = serializers.IntegerField(read_only=True)
+    is_supplier = serializers.SerializerMethodField()
+    supplied_products_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Seller
         fields = "__all__"
+
+    def get_is_supplier(self, obj):
+        """Проверяет, является ли продавец поставщиком"""
+        return obj.supplied_items.exists()
 
 
 class ProductSerializer(serializers.ModelSerializer):

@@ -1,9 +1,11 @@
+from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
                                      UpdateAPIView)
 
+from retail.filters import SupplierFilter
 from retail.mixins import ActiveEmployeePermissionMixin
 from retail.models import Product, Seller, SellerProduct
 from retail.pagination import CustomPagination
@@ -54,6 +56,30 @@ class SellerDestroyAPIView(ActiveEmployeePermissionMixin, DestroyAPIView):
 
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
+
+
+class SupplierListAPIView(ActiveEmployeePermissionMixin, ListAPIView):
+    """Вывод списка поставщиков с расширенной фильтрацией"""
+
+    serializer_class = SellerSerializer
+    pagination_class = CustomPagination
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = SupplierFilter
+    search_fields = ["seller_title", "email", "city"]
+    ordering_filds = ["seller_title", "creation_time", "supplied_products_count"]
+    ordering = ["seller_title"]
+
+    def get_queryset(self):
+        # Аннотируем количество поставляемых товаров
+        return Seller.objects.filter(
+            supplied_items__isnull=False
+        ).annotate(
+            supplied_products_count=Count("supplied_items", distinct=True)
+        ).distinct()
 
 
 class ProductCreateAPIView(ActiveEmployeePermissionMixin, CreateAPIView):
