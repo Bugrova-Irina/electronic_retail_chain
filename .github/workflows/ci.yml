@@ -45,6 +45,16 @@ jobs:
         ports:
           - 5432:5432
 
+    env:
+      SECRET_KEY: "dummy-secret-key-for-testing-12345"
+      DEBUG: "True"
+      NAME: "electronic-retail"
+      USER: "postgres"
+      PASSWORD: "12345"
+      HOST: "localhost"
+      PORT: "5432"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,testserver"
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3
