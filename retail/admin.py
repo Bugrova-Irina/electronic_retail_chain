@@ -5,6 +5,12 @@ from django.utils.html import format_html
 
 from retail.models import Product, Seller, SellerProduct
 
+CLEAR_DEBT_BUTTON_STYLE = (
+    "background: #dc3545; color: white; padding: 5px 10px; "
+    "text-decoration: none; border-radius: 3px; border: none; "
+    "display: inline-block;"
+)
+
 
 @admin.register(Seller)
 class SellerAdmin(admin.ModelAdmin):
@@ -114,8 +120,9 @@ class SellerProductAdmin(admin.ModelAdmin):
         if obj.debt > 0:
             url = reverse("admin:retail_sellerproduct_clear_debt", args=[obj.id])
             return format_html(
-                '<a class="button" href="{}" style="background: #dc3545; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; border: none; display: inline-block;">Очистить долг</a>',
+                '<a class="button" href="{}" style="{}">Очистить долг</a>',
                 url,
+                CLEAR_DEBT_BUTTON_STYLE
             )
         else:
             return format_html(

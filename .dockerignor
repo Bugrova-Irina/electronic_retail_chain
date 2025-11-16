@@ -1,0 +1,19 @@
+**
+!config/
+!retail/
+!users/
+!manage.py
+!poetry.lock
+!pyproject.toml
+!README.md
+
+# Исключения
+.git
+.gitignore
+.env
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.DS_Store

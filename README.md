@@ -1,4 +1,4 @@
-# Торговая сеть электроники на DjangoRestFramework
+# Торговая сеть электроники с иерархической структурой поставщиков на DjangoRestFramework
 ```python manage.py runserver``` - запуск веб-приложения. Ctrl+C - остановка сервера.
 
 ```python manage.py createsuperadmin```- создание суперпользователя, логин и пароль задаете сами.
@@ -113,7 +113,8 @@ POST /users/login/
  - drf-yasg
  - django-filter
 
-В качестве базы данных используется PostgreSQL
+В качестве базы данных используется PostgreSQL.
+Установите Docker.
 
 ## Установка:
 
@@ -257,33 +258,46 @@ POST http://127.0.0.1:8000/retail/seller-product/create/
 ### Запуск проекта с использованием Docker Compose (для разработки):
 
 #### Команды для запуска:
-Выполните сборку образов:
+Запустите приложение
 ```
-docker-compose build
+docker-compose up --build -d
 ```
-
-Запуск контейнеров в фоновом режиме:
-```
-docker-compose up -d
-```
-
 Убедитесь, что все контейнеры запущены:
 ```
 docker-compose ps
 ```
+Оба контейнера (backend и db) должны быть в состоянии Up.
 
-Примените миграции базы данных:
-```
-docker-compose exec backend python manage.py migrate
-```
+Автоматическое создание суперпользователя:
+- При первом запуске автоматически создается суперпользователь:
+  - Email: admin@example.com
+  - Пароль: admin123
 
-Создайте учетную запись администратора
-```
-docker-compose exec web python manage.py createadmin
-```
+#### Проверка работы приложения:
 
-Проверка работы приложения:
-Перейдите по адресу: http://localhost:8080/retail/
+1. Административная панель Django.
+* URL: http://localhost:8080/admin/
+* Учетные данные: admin@example.com / admin123
+2. API эндпоинты.
+
+Требуется аутентификация (JWT токен)
+
+Получение токена доступа:
+```
+curl -X POST http://localhost:8080/users/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "password": "admin123"}'
+```
+#### Импорт тестовых данных для проверки работы приложения
+Загрузка данных отдельно для приложения retail, отдельно для users.
+```
+docker-compose exec backend python manage.py loaddata retail_data.json
+docker-compose exec backend python manage.py loaddata users_data.json
+```
+Или сразу все данные для обоих приложений.
+```
+docker-compose exec backend python manage.py loaddata all_data.json
+```
 
 ## Тестирование:
 
