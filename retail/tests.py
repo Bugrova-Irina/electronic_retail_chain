@@ -1,10 +1,8 @@
-from http.client import responses
-
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from retail.models import Seller, SellerProduct, Product
+from retail.models import Product, Seller, SellerProduct
 from users.models import User
 
 
@@ -13,10 +11,7 @@ class SellerTestCase(APITestCase):
 
     def setUp(self):
         # Экземпляр пользователя
-        self.user = User.objects.create(
-            email="admin@example.com",
-            is_active=True
-        )
+        self.user = User.objects.create(email="admin@example.com", is_active=True)
         # Экземпляр продавца
         self.seller = Seller.objects.create(
             seller_title="Factory 1",
@@ -118,14 +113,14 @@ class SellerTestCase(APITestCase):
             product=product1,
             supplier=factory_supplier,
             selling_price=1000.00,
-            quantity=5
+            quantity=5,
         )
         SellerProduct.objects.create(
             seller=non_supplier,
             product=product2,
             supplier=retail_supplier,
             selling_price=2000.00,
-            quantity=3
+            quantity=3,
         )
 
         url = reverse("retail:suppliers")
@@ -133,7 +128,7 @@ class SellerTestCase(APITestCase):
         data = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(data["count"], 2) # Два поставщика
+        self.assertEqual(data["count"], 2)  # Два поставщика
 
         # Проверяем, что не-поставщик не в списке
         supplier_titles = [s["seller_title"] for s in data["results"]]
@@ -149,25 +144,25 @@ class SellerTestCase(APITestCase):
             seller_title="Russian factory",
             seller_type="factory",
             email="factory_ru@test.com",
-            country="Russia"
+            country="Russia",
         )
         retail_ru = Seller.objects.create(
             seller_title="Russian retail",
             seller_type="retail",
             email="retail_ru@test.com",
-            country="Russia"
+            country="Russia",
         )
         factory_de = Seller.objects.create(
             seller_title="German factory",
             seller_type="factory",
             email="factory_de@test.com",
-            country="Germany"
+            country="Germany",
         )
 
         product = Product.objects.create(
             product_title="Test Product",
             manufacturer=factory_ru,
-            product_launch_date="2024-01-03"
+            product_launch_date="2024-01-03",
         )
 
         # Создаем связи для всех поставщиков
@@ -177,7 +172,7 @@ class SellerTestCase(APITestCase):
                 product=product,
                 supplier=supplier,
                 selling_price=1000.00,
-                quantity=1
+                quantity=1,
             )
 
         # Тест фильтрации по стране
@@ -205,10 +200,7 @@ class ProductTestCase(APITestCase):
 
     def setUp(self):
         # Экземпляр пользователя
-        self.user = User.objects.create(
-            email="admin@example.com",
-            is_active=True
-        )
+        self.user = User.objects.create(email="admin@example.com", is_active=True)
         # Экземпляр продавца
         self.seller = Seller.objects.create(
             seller_title="Factory 1",
@@ -286,10 +278,7 @@ class SellerProductTestCase(APITestCase):
 
     def setUp(self):
         # Экземпляр пользователя
-        self.user = User.objects.create(
-            email="admin@example.com",
-            is_active=True
-        )
+        self.user = User.objects.create(email="admin@example.com", is_active=True)
         # Экземпляр продавца
         self.seller = Seller.objects.create(
             seller_title="Factory 1",
@@ -315,7 +304,7 @@ class SellerProductTestCase(APITestCase):
             product=self.product,
             selling_price=100.00,
             quantity=10,
-            supplier=self.supplier
+            supplier=self.supplier,
         )
         # Аутентификация пользователя
         self.client.force_authenticate(user=self.user)
@@ -385,7 +374,10 @@ class SellerProductTestCase(APITestCase):
         product_data = data["results"][0]
         self.assertEqual(product_data["seller"], self.sellerproduct.seller.id)
         self.assertEqual(product_data["product"], self.sellerproduct.product.id)
-        self.assertEqual(float(product_data["selling_price"]), float(self.sellerproduct.selling_price))
+        self.assertEqual(
+            float(product_data["selling_price"]),
+            float(self.sellerproduct.selling_price),
+        )
         self.assertEqual(product_data["quantity"], self.sellerproduct.quantity)
         self.assertEqual(product_data["supplier"], self.sellerproduct.supplier.id)
 
@@ -397,7 +389,7 @@ class SellerProductTestCase(APITestCase):
             "product": self.product.id,
             "selling_price": "150.15",
             "quantity": 15,
-            "supplier": self.seller.id  # Нарушение валидации
+            "supplier": self.seller.id,  # Нарушение валидации
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

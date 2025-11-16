@@ -75,11 +75,11 @@ class SupplierListAPIView(ActiveEmployeePermissionMixin, ListAPIView):
 
     def get_queryset(self):
         # Аннотируем количество поставляемых товаров
-        return Seller.objects.filter(
-            supplied_items__isnull=False
-        ).annotate(
-            supplied_products_count=Count("supplied_items", distinct=True)
-        ).distinct()
+        return (
+            Seller.objects.filter(supplied_items__isnull=False)
+            .annotate(supplied_products_count=Count("supplied_items", distinct=True))
+            .distinct()
+        )
 
 
 class ProductCreateAPIView(ActiveEmployeePermissionMixin, CreateAPIView):

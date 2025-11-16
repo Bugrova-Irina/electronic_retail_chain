@@ -58,7 +58,5 @@ urlpatterns = [
         SellerProductDestroyAPIView.as_view(),
         name="seller-product-delete",
     ),
-    path(
-        "suppliers/", SupplierListAPIView.as_view(), name="suppliers"
-    ),
+    path("suppliers/", SupplierListAPIView.as_view(), name="suppliers"),
 ]
