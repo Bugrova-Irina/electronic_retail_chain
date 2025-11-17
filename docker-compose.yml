@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:15.1-alpine
+    environment:
+      POSTGRES_DB: ${NAME}
+      POSTGRES_USER: ${USER}
+      POSTGRES_PASSWORD: ${PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+    ports:
+      - "${PORT}:5432"
+    healthcheck:
+      test: pg_isready -U ${USER} -d ${NAME}
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    networks:
+      - app-network
+
+  backend:
+    build: .
+    command: >
+      bash -c "
+      echo 'Waiting for database...' &&
+      sleep 10 &&
+      python manage.py migrate &&
+      python manage.py shell -c \"from users.models import User; User.objects.create_superuser('admin@example.com', 'admin123') if not User.objects.filter(email='admin@example.com').exists() else None\" &&
+      python manage.py runserver 0.0.0.0:8000"
+    env_file: .env
+    environment:
+      HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8000"
+    networks:
+      - app-network
+
+volumes:
+  pg_data:
+
+networks:
+  app-network:
+    driver: bridge
